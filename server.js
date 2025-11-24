@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./Routes/AuthRouter");
 const adminRoutes = require("./Routes/AdminRouter");
 const workoutRouters = require("./Routes/workoutRoutes");
-const ProgressRouter = require("../backend/Routes/Progress.Router");
-const ImageRouter = require("../backend/Routes/ImageRouter");
+const ProgressRouter = require("./Routes/Progress.Router");
+const ImageRouter = require("./Routes/ImageRouter");
 
 connectToDB();
 
