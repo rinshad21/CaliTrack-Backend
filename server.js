@@ -15,11 +15,10 @@ connectToDB();
 
 app.use(express.json());
 
-
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://calitrack-three.vercel.app/"],
     credentials: true,
   })
 );
@@ -29,7 +28,6 @@ app.use("/admin", adminRoutes);
 app.use("/api/workouts", workoutRouters);
 app.use("/api/progress", ProgressRouter);
 app.use("/api/image", ImageRouter);
-
 
 app.get("/ping", (req, res) => {
   res.send("pong");
