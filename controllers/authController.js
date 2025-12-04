@@ -31,10 +31,25 @@ const signup = async (req, res) => {
       level,
     });
     await newUser.save();
+    const accessToken = jwt.sign(
+      {
+        userId: newUser._id,
+        username: newUser.username,
+        role: newUser.role,
+        level: newUser.level,
+      },
+      Jwt_key,
+      { expiresIn: "1d" }
+    );
+
     if (newUser) {
       return res.status(200).json({
         success: true,
         message: "user have been created successfully",
+        token: accessToken,
+        email: newUser.email,
+        name: newUser.username,
+        level: newUser.level,
       });
     }
   } catch (error) {
