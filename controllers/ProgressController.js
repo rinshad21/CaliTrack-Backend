@@ -1,10 +1,11 @@
 const express = require("express");
 const Progress = require("../Models/Progress");
+const cloudinary = require("cloudinary").v2;
 
 const updateProgress = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { weight, bodyFat, waist, chest, photoUrl } = req.body;
+    const { weight, bodyFat, waist, chest, photoUrl, photoPublicId } = req.body;
 
     let userProgress = await Progress.findOne({ userId });
 
@@ -15,6 +16,7 @@ const updateProgress = async (req, res) => {
       chest,
       date: new Date(),
       photoUrl: photoUrl || undefined,
+      photoPublicId: photoPublicId || undefined,
     };
 
     if (!userProgress) {
@@ -46,29 +48,33 @@ const getProgress = async (req, res) => {
 };
 const deleteProgress = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedProgress = await Progress.findOneAndUpdate(
-      { userId: req.user.userId },
+    const { id } = req.params; // Entry ID from frontend
+    const userId = req.user.userId;
+
+    const record = await Progress.findOne({ userId });
+    if (!record) return res.status(404).json({ message: "Record not found" });
+
+    // Find the specific entry to get its publicId
+    const entry = record.entries.find((e) => e._id.toString() === id);
+
+    // Delete from Cloudinary if ID exists
+    if (entry && entry.photoPublicId) {
+      await cloudinary.uploader.destroy(entry.photoPublicId);
+    }
+
+    // Remove from MongoDB array
+    const updatedRecord = await Progress.findOneAndUpdate(
+      { userId },
       { $pull: { entries: { _id: id } } },
       { new: true }
     );
-    if (!deletedProgress) {
-      res.status(400).json({
-        success: false,
-        message: "no progress not found",
-      });
+    if (updatedRecord && updatedRecord.entries.length === 0) {
+      await Progress.deleteOne({ userId });
     }
-    res.status(200).json({
-      success: true,
-      message: "Progress has been deleted successfully ",
-    });
+
+    res.status(200).json({ success: true, message: "Entry and Image deleted" });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "error occured ,failed to delete book ",
-      error,
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 

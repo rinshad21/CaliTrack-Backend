@@ -22,13 +22,13 @@ router.post("/upload", upload.single("my_file"), async (req, res) => {
     let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
     const result = await cloudinary.uploader.upload(dataURI);
 
-    // ✅ Return secure_url
+    // Return secure_url
     res.status(200).json({
       success: true,
       message: "Image uploaded successfully",
-      secure_url: result.secure_url, // ✅ Add this
-      public_id: result.public_id,
-      ...result, // Return all Cloudinary data
+      photo_url: result.secure_url, 
+      photoPublicId: result.public_id,
+      ...result, 
     });
   } catch (error) {
     res.status(500).json({

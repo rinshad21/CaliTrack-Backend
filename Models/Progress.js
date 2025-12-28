@@ -10,6 +10,7 @@ const progressSchema = new mongoose.Schema({
       waist: { type: Number },
       chest: { type: Number },
       photoUrl: { type: String },
+      photoPublicId: { type: String },
     },
   ],
 });
