@@ -48,21 +48,21 @@ const getProgress = async (req, res) => {
 };
 const deleteProgress = async (req, res) => {
   try {
-    const { id } = req.params; // Entry ID from frontend
+    const { id } = req.params; 
     const userId = req.user.userId;
 
     const record = await Progress.findOne({ userId });
     if (!record) return res.status(404).json({ message: "Record not found" });
 
-    // Find the specific entry to get its publicId
+    
     const entry = record.entries.find((e) => e._id.toString() === id);
 
-    // Delete from Cloudinary if ID exists
+   
     if (entry && entry.photoPublicId) {
       await cloudinary.uploader.destroy(entry.photoPublicId);
     }
 
-    // Remove from MongoDB array
+  
     const updatedRecord = await Progress.findOneAndUpdate(
       { userId },
       { $pull: { entries: { _id: id } } },

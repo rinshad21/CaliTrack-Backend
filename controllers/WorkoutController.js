@@ -39,12 +39,15 @@ const PostWorkout = async (req, res) => {
 const getAllWorkouts = async (req, res) => {
   try {
     const role = req.user.role;
-    const level = req.user.level;
 
     let query = {};
 
-    if (role !== "admin") {
-      query.level = level;
+    if (role !== "admin") {  
+      const user = await User.findById(req.user.userId).select("level");
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      query.level = user.level;
     }
 
     const workouts = await Workout.find(query).sort({ createdAt: -1 });

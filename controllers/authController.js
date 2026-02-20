@@ -39,7 +39,7 @@ const signup = async (req, res) => {
         level: newUser.level,
       },
       Jwt_key,
-      { expiresIn: "7d" }
+      { expiresIn: "1d" }
     );
 
     if (newUser) {
